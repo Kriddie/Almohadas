@@ -4,7 +4,9 @@ library(dplyr)
 library(ggplot2)
 library(plotly)
 
+#read in data
 CO2_df <- read.csv(here::here("FieldData/CO2_FieldData.csv"))
+#rename columns
 colnames(CO2_df) <- c("Date","Time","Site","Plot","Plant_Stage","Veg_vol","Air_vol",
                       "NEE_mol.m2.s","ER_mol.m2.s","NEE_gCO2.m2.h1","ER_gCO2.m2.h1",
                       "GPP_gCO2.m2.h1","CO2_day_RAW","CO2_night_RAW","AirTemp_C","SoilTemp_C",
@@ -12,7 +14,9 @@ colnames(CO2_df) <- c("Date","Time","Site","Plot","Plant_Stage","Veg_vol","Air_v
                       "Radiation_rep1_Wm2","Radiation_rep2_Wm2","Radiation_rep3_Wm2","Radiation_rep4_Wm2",
                       "comments")
 
+#read in data
 CH4_df <- read.csv(here::here("FieldData/CH4_FieldData.csv"))
+#rename columns
 colnames(CH4_df) <- c("Date","Time","Site","Plot","Plant_Stage","Veg_vol","Air_vol",
                       "CH4_day","CH4_night","AirTemp_C","SoilTemp_C",
                       "RH","Dewpoint_C","Subsoil_percent","Subsoil_pound",
@@ -29,8 +33,10 @@ CO2_df$Radiation_rep2_Wm2 <- as.numeric(CO2_df$Radiation_rep2_Wm2)
 CO2_df$Radiation_rep3_Wm2 <- as.numeric(CO2_df$Radiation_rep3_Wm2)
 CO2_df$Radiation_rep4_Wm2 <- as.numeric(CO2_df$Radiation_rep4_Wm2)
 
+#plot names are sometime uppercase, wich gets confusing. change all uppercase to lowwer
 CO2_df$Plot <- tolower(CO2_df$Plot)
 
+#I was trying to do a mean of radiation columns - doesn't work yet
 CO2_df$Radiation_ave_Wm2 <- colMeans(CO2_df[ , c("Radiation_rep1_Wm2","Radiation_rep2_Wm2","Radiation_rep3_Wm2","Radiation_rep4_Wm2")])
 CO2_df$Radiation_ave_Wm2 <- colMeans(CO2_df[ , c(21:24)], na.rm=TRUE)
 
@@ -44,12 +50,15 @@ CO2_df$Radiation_ave_Wm2 <- colMeans(CO2_df[ , c(21:24)], na.rm=TRUE)
 ggplot(CO2_df ,aes(x=Radiation_rep2_Wm2,y=abs(GPP_gCO2.m2.h1))) +
   geom_point(aes(color=Plot),size=4)+                                     
   theme_bw(base_size = 16) 
+#Radiation vs GPP (log each variable and absolute value of GPP)
 ggplot(CO2_df ,aes(x=log1p(Radiation_rep2_Wm2),y=log1p(abs(GPP_gCO2.m2.h1)))) +
   geom_point(aes(color=Plot),size=4)+                                     
   theme_bw(base_size = 16) 
+#radiation vs soil temp
 ggplot(CO2_df ,aes(x=log1p(Radiation_rep2_Wm2),y=log1p(SoilTemp_C))) +
   geom_point(aes(color=Plot),size=4)+                                     
-  theme_bw(base_size = 16) 
+  theme_bw(base_size = 16)
+#ratiaon and air temp
 ggplot(CO2_df ,aes(x=log1p(Radiation_rep2_Wm2),y=log1p(AirTemp_C))) +
   geom_point(aes(color=Plot),size=4)+                                     
   theme_bw(base_size = 16) 
@@ -57,7 +66,9 @@ ggplot(CO2_df ,aes(x=log1p(Radiation_rep2_Wm2),y=log1p(AirTemp_C))) +
 #ER
 ggplot(CO2_df ,aes(x=log1p(SoilTemp_C),y=log1p(ER_mol.m2.s))) +
   geom_point(aes(color= as.character(Plot)),size=4)+                                     
-  theme_bw(base_size = 16) 
+  theme_bw(base_size = 16)
+
+
 
 
 
