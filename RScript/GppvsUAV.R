@@ -1,4 +1,7 @@
-#this r script is to explore the relationship between radiation and GPP
+#this r script is to explore the relationship between CO2 and CH4 dynamics and other environmental factors
+#author: Kriddie
+#Date: 10/13/2023
+
 library(here)
 library(dplyr)
 library(ggplot2)
