@@ -1,0 +1,89 @@
+##NUEVOS DATOS ACTUALIZADOS###
+library(readxl)
+attach(cushion)
+library(ggplot2)
+
+##plotting stage vs reponse variables
+stageNEEh<-ggplot(cushion, aes(stage, NEEh, group=stage, color=NEEh))+
+  stat_summary(fun=mean, geom="point")+
+  stat_summary(fun.data=mean_se, geom="errorbar")+
+  theme_bw()+
+  guides(fill=guide_legend(title="stage"))
+stageNEEh
+
+model1 <- aov(NEEh ~ stage, data = cushion)
+summary(model1)
+
+stageGPPh<-ggplot(cushion, aes(stage, GPPh, group=stage, color=GPPh))+
+  stat_summary(fun=mean, geom="point")+
+  stat_summary(fun.data=mean_se, geom="errorbar")+
+  theme_bw()+
+  guides(fill=guide_legend(title="stage"))
+stageGPPh
+
+model2 <- aov(GPPh ~ stage, data = cushion)
+summary(model2)
+
+stageERh<-ggplot(cushion, aes(stage, ERh, group=stage, color=ERh))+
+  stat_summary(fun=mean, geom="point")+
+  stat_summary(fun.data=mean_se, geom="errorbar")+
+  theme_bw()+
+  guides(fill=guide_legend(title="stage"))
+stageERh
+
+stageplantago<-ggplot(cushion, aes(stage, plantago, group=stage, color=plantago))+
+  stat_summary(fun=mean, geom="point")+
+  stat_summary(fun.data=mean_se, geom="errorbar")+
+  theme_bw()+
+  guides(fill=guide_legend(title="stage"))
+stageplantago
+
+
+###multilinear regression
+attach(cushion)
+library(readxl)
+library(ggplot2) 
+
+ggplt <- ggplot(cushion, aes(x=radiation, y=NEEh, shape=stage))+ 
+  geom_point()+ 
+  theme_classic() 
+
+ggplt 
+
+# Plotting multiple Regression Lines 
+ggplt+geom_smooth(method=lm,se=FALSE,fullrange=TRUE, 
+                  aes(color=stage)) 
+
+
+##plantago y NEEh with normal regrression
+model1 <- ggplot(cushion, aes(richness, ERh)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+model1
+
+
+
+###relation between airtemp and radiation with other variables##
+##checkinng normality???
+hist1<-ggplot(cushion, aes(airtemp))+
+  geom_histogram(bins=10, aes(y=..density..))+
+  geom_density(alpha=0.2, fill="red")
+
+model1 <- ggplot(cushion, aes(airtemp, ERh)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+hist1<-ggplot(cushion, aes(radiation))+
+  geom_histogram(bins=10, aes(y=..density..))+
+  geom_density(alpha=0.2, fill="red")
+
+model1 <- ggplot(cushion, aes(radiation, ERh)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+
+###multilinear with statistics?
+library(tidyverse)
+model2 <- lm(NEEh ~ richness + stage + plantago + airtemp 
+             + soiltemp + rh + subsoil + radiation, data = cushion)
+summary(model2)
