@@ -2,7 +2,7 @@
 #author: Kriddie
 #Date: 10/13/2023
 
-library(here)
+library(here)# by using the function "here" in the here package, the working directory is set to the project folder
 library(dplyr)
 library(ggplot2)
 library(plotly)
