@@ -7,7 +7,8 @@ library(ggplot2)
 library(plotly)
 
 #read in water level data
-df_WL <- read.csv(here::here("FieldData/WaterTable_CayambeCoca.csv"),header = TRUE,skip=11)[c(1,2,4,5)]
+df_WL <- read.csv(here::here("FieldData/WaterTable_CayambeCoca_2023-10-23.csv"),header = TRUE,skip=11)[c(1,2,4,5)]
+
 colnames(df_WL) <- c("Date","Time","WL_kpa","WLTemp_c")
 df_WL$DateTime <- as.POSIXct(paste(df_WL$Date, df_WL$Time), format="%m/%d/%Y %I:%M:%S %p", tz="UTC")
 
