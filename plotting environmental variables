@@ -1,0 +1,128 @@
+#Graphing temp, water level by time 
+#libraries I need 
+library(lubridate)     
+library(dplyr)
+library(readxl)
+library(ggplot2)
+library(plotly)
+library(here)
+
+WL_parqueadero_csv <- read.csv("FieldData/WL_parqueadero_corrected_2023-08-25.csv")
+View(WL_parqueadero_csv)
+  
+WL_parqueadero_csv$DateTime <- as.POSIXct(WL_parqueadero_csv$DateTime, format="%Y-%m-%d %H:%M:%S", tz="UTC")
+
+
+ggplot(data = WL_parqueadero_csv, aes(x = DateTime, y = WL_cm, group = WL_cm, color = WL_cm)) +
+    geom_point() +
+    labs(x = "Date", y = "Water Level") +
+    ggtitle("Water Level") +
+    theme_bw() +
+    theme(plot.title = element_text(hjust = 0.5)) #+
+
+
+P <- ggplot(data = WL_parqueadero_csv, aes(x = DateTime, y = WL_cm)) + 
+  geom_point(size=1)#With this code I have the dates divide by months but It doesn't show the dates from 2022
+print(P)
+#Water Table 
+#x-axis divided by month and year 
+library(scales)
+ggplot(data = WL_parqueadero_csv, aes(x = DateTime, y = WL_cm, color = WL_cm)) +
+  geom_point() +
+  labs(x = "Date", y = "Water Table") +
+  ggtitle("") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(text=element_text(size=10))+
+  ylim(min(WL_parqueadero_csv$WL_cm) - 1, max(WL_parqueadero_csv$WL_cm) + 1) +
+  guides(color = guide_legend(title = "centimeters")) +
+  # Set breaks and labels for the x-axis
+  scale_x_datetime(breaks = seq(from = as.POSIXct("2022-01-01"), to = as.POSIXct("2023-08-01"), by = "1 month"),
+                   labels = date_format("%b-%Y"))
+#Temperature from one cushion plant
+Ibutton_ <- read_csv("C:/Users/marti/Downloads/Ibutton .csv", 
+                       +     col_types = cols(Date...1 = col_date(format = "%m/%d/%Y"), 
+                                              +         `Plot number` = col_character(), 
+                                              +         `Stage number` = col_character(), 
+                                              +         Time = col_time(format = "%H:%M:%S"), 
+                                              +         `Value C` = col_number()))
+#the field has date and hour in separete columns-> next step: merged both 
+
+colnames(Ibutton_) <- c("date1", "plot_n", "stage", "Date", "Time", "Unit", "value_c")
+
+Ibutton_$DateTime <- as.POSIXct(paste(Ibutton_$Date, Ibutton_$Time), format="%Y-%m-%d %H:%M:%S")
+
+
+#I need just one plot(cushion)-> create one subset 
+
+
+cushion2 <- Ibutton_[Ibutton_$plot_n == 2, ]
+View(cushion2)
+#Plot with a subset 
+ggplot(data = cushion2, aes(x = DateTime, y = value_c, group = plot_n, color = plot_n)) +
+  geom_point() +
+  labs(x = "Date", y = "Temperature [ºC]") +
+  ggtitle("") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(text=element_text(size=10))+
+  guides(color = guide_legend(title = "plot #"))
+#Plot with all the plots 
+ggplot(data = Ibutton_, aes(x = DateTime, y = value_c, group = plot_n, color = plot_n)) +
+  geom_point() +
+  labs(x = "Date", y = "Temperature [ºC]") +
+  ggtitle("") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(text=element_text(size=10))+
+  guides(color = guide_legend(title = "plot #"))
+
+#air temperature 
+colnames(air_temp) <- c("date1", "plot_n", "stage", "Date", "Time", "Unit", "value_c")
+air_temp$DataTime <- as.POSIXct(paste(air_temp$Date, air_temp$Time), format="%Y-%m-%d %H:%M:%S")
+
+#soil temperature 
+colnames(soil_temp) <- c("date1", "plot_n", "stage", "Date", "Time", "Unit", "value_c")
+soil_temp$DataTime <- as.POSIXct(paste(soil_temp$Date, soil_temp$Time), format="%Y-%m-%d %H:%M:%S")
+
+#combined soil, air and one plot 
+soil_temp$Name <- "soil"
+air_temp$Name <- "air"
+cushion2$Name <- "cushion"
+#make sure all the col have the same name 
+colnames(cushion2) <- c("date1", "plot_n", "stage", "Date", "Time", "Unit", "value_c", "DateTime", "Name")
+colnames(air_temp) <- c("date1", "plot_n", "stage", "Date", "Time", "Unit", "value_c", "DateTime", "Name")
+colnames(soil_temp) <- c("date1", "plot_n", "stage", "Date", "Time", "Unit", "value_c", "DateTime", "Name")
+
+temperature_c <- rbind(soil_temp, air_temp, cushion2)
+View(temperature_c)
+#plotting 
+ggplot(data = temperature_c, aes(x = DateTime, y = value_c, group = Name, color = Name)) +
+  geom_line() +
+  labs(x = "Date", y = "Temperature [ºC]") +
+  ggtitle("") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))+
+  theme(text=element_text(size=10))+
+  guides(color = guide_legend(title = "Site"))
+#erasing NA data 
+# Remove rows with NA values from the entire data frame
+temperature_c <- na.omit(temperature_c)
+
+#plotting
+ggplot(data = temperature_c, aes(x = as.POSIXct(DateTime), y = value_c, group = Name, color = Name)) +
+  geom_line() +
+  facet_wrap(~ Unit, scales = "free_y", ncol = 1) +
+  labs(x = "Date", y = "Temperature [ºC]") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(text = element_text(size = 10)) +
+  guides(color = guide_legend(title = "Site"))#i like but I have to erase NA data first
+#plotting 
+ggplot(data = temperature_c, aes(x = Name, y = value_c, fill = Name)) +
+  geom_boxplot() +
+  labs(x = "Location", y = "Temperature [ºC]") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(text = element_text(size = 10)) +
+  guides(fill = guide_legend(title = "Site"))
