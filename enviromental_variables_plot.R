@@ -7,7 +7,7 @@ library(ggplot2)
 library(plotly)
 library(here)
 #WATER TABLE PLOT
-WL_parqueadero_csv <- read.csv("FieldData/WL_parqueadero_corrected_2023-08-25.csv")
+WL_parqueadero_csv <- read.csv(here::here("FieldData/WL_parqueadero_corrected_2023-08-25.csv"))
 View(WL_parqueadero_csv)
   
 WL_parqueadero_csv$DateTime <- as.POSIXct(WL_parqueadero_csv$DateTime, format="%Y-%m-%d %H:%M:%S", tz="UTC")
@@ -35,8 +35,10 @@ ggplot(data = WL_parqueadero_csv, aes(x = DateTime, y = WL_cm, color = WL_cm)) +
   scale_x_datetime(breaks = seq(from = as.POSIXct("2022-01-01"), to = as.POSIXct("2023-08-01"), by = "1 month"),
                    labels = date_format("%b-%Y"))
 #MOISTURE INSIDE THE PLANT
+    #please fix the pathway top the file so that I can rin your script
+    ##use the "here" package so that everyone can run your code without errors 
 logger9710 <- read_excel(
-  "~/Almohada project (compu)/HOBO data/hobo  data_4-07-2023/21519710_julio.xlsx",
+  "~/Almohadas/HOBO data/hobo  data_4-07-2023/21519710_julio.xlsx",    #this line works for your computer, but that's not were the file is on my computer. Look at the 
   col_types = c("numeric", "date", "numeric", "numeric")
 )
 logger9710_1 <- read_excel(
